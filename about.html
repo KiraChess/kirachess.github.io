@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>about project — kira</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: #a0a0a0;
+      --line: #303030;
+      --font: "League Spartan", "Century Gothic", "Avenir Next", system-ui, sans-serif;
+      --pad: clamp(1.25rem, 4vw, 3rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { color-scheme: dark; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 1px solid #fff; outline-offset: 5px; }
+
+    .site-header {
+      width: min(100% - 2 * var(--pad), 84rem);
+      min-height: 6.5rem;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 2rem;
+    }
+    .logo {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.65rem;
+      padding: .35rem .7rem .2rem;
+      border: 1px solid #fff;
+      color: #fff;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1;
+      text-decoration: none;
+    }
+    .nav { display: flex; align-items: center; gap: clamp(1.4rem, 3vw, 2.5rem); }
+    .nav a {
+      position: relative;
+      padding: .55rem 0;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 500;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+    .nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .2s ease;
+    }
+    .nav a:hover, .nav a:focus-visible, .nav a[aria-current="page"] { color: #fff; }
+    .nav a:hover::after, .nav a:focus-visible::after, .nav a[aria-current="page"]::after { transform: scaleX(1); }
+
+    .lang { position: relative; justify-self: end; z-index: 2; }
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem 0;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color .2s ease;
+    }
+    .lang-toggle:hover, .lang.is-open .lang-toggle { color: #fff; }
+    .lang-chevron { width: .65rem; height: .65rem; transition: transform .2s ease; }
+    .lang.is-open .lang-chevron { transform: rotate(180deg); }
+    .lang-menu {
+      position: absolute;
+      top: calc(100% + .5rem);
+      right: 0;
+      display: grid;
+      grid-template-rows: 0fr;
+      min-width: 8rem;
+      visibility: hidden;
+      transition: grid-template-rows .25s ease, visibility 0s linear .25s;
+    }
+    .lang.is-open .lang-menu { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+    .lang-menu ul {
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      list-style: none;
+      background: #111;
+    }
+    .lang-menu button {
+      width: 100%;
+      padding: .55rem .9rem;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .lang-menu button:hover, .lang-menu button:focus-visible, .lang-menu button[aria-current="true"] { color: #fff; }
+
+    .about {
+      width: min(100% - 2 * var(--pad), 52rem);
+      margin: 0 auto;
+      padding: clamp(4rem, 9vw, 7rem) 0 6rem;
+    }
+    .about h1 {
+      margin: 0;
+      font-size: clamp(3rem, 7vw, 5rem);
+      line-height: 1;
+      letter-spacing: -.045em;
+      overflow-wrap: anywhere;
+    }
+    .about p {
+      max-width: 35rem;
+      margin: 2rem 0 0;
+      color: var(--muted);
+      font-size: clamp(1.2rem, 2vw, 1.45rem);
+      line-height: 1.5;
+    }
+    .about-link {
+      display: inline-block;
+      margin-top: 2rem;
+      padding-bottom: .25rem;
+      border-bottom: 1px solid #777;
+      text-decoration: none;
+      transition: border-color .2s ease;
+    }
+    .about-link:hover { border-color: #fff; }
+    @media (max-width: 700px) {
+      .site-header { min-height: 0; grid-template-columns: 1fr auto; gap: 1.25rem 1rem; padding: 1.25rem 0; }
+      .logo { grid-row: 1; grid-column: 1; font-size: 1.5rem; min-height: 2.4rem; }
+      .lang { grid-row: 1; grid-column: 2; }
+      .nav { grid-row: 2; grid-column: 1 / -1; justify-content: center; flex-wrap: wrap; gap: .25rem 1.5rem; }
+      .about { padding: 4rem 0 6rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav a, .nav a::after, .lang-toggle, .lang-chevron, .lang-menu, .about-link { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html#home">kira</a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="index.html#home" data-i18n="main">main</a>
+      <a href="index.html#devblog" data-i18n="devblog">devblog</a>
+      <a href="index.html#about" aria-current="page" data-i18n="about">about project</a>
+    </nav>
+
+    <div class="lang">
+      <button class="lang-toggle" type="button" aria-expanded="false" aria-controls="lang-menu">
+        <span class="lang-label" lang="en">english</span>
+        <svg class="lang-chevron" viewBox="0 0 10 10" aria-hidden="true">
+          <path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="lang-menu" id="lang-menu">
+        <ul>
+          <li><button type="button" lang="en" data-lang="en" aria-current="true">english</button></li>
+          <li><button type="button" lang="ja" data-lang="ja">日本語</button></li>
+          <li><button type="button" lang="zh-Hans" data-lang="zh-Hans">中文</button></li>
+          <li><button type="button" lang="es" data-lang="es">español</button></li>
+          <li><button type="button" lang="de" data-lang="de">deutsch</button></li>
+          <li><button type="button" lang="pl" data-lang="pl">polski</button></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+  <main class="about">
+    <h1 data-i18n="about">about project</h1>
+    <p data-i18n="description">kira is an independent UCI chess engine.</p>
+    <a class="about-link" href="https://github.com/KiraChess/Kira" target="_blank" rel="noopener noreferrer">GitHub Repository ↗</a>
+  </main>
+  <script>
+    (() => {
+      const root = document.querySelector(".lang");
+      const toggle = root.querySelector(".lang-toggle");
+      const label = root.querySelector(".lang-label");
+      const items = root.querySelectorAll(".lang-menu button");
+      const nav = document.querySelector(".nav");
+      const strings = {
+        en: { nav: "main", main: "main", devblog: "devblog", about: "about project", description: "kira is an independent UCI chess engine." },
+        ja: { nav: "メインナビゲーション", main: "ホーム", devblog: "開発ブログ", about: "プロジェクトについて", description: "kiraは独立したUCIチェスエンジンです。" },
+        "zh-Hans": { nav: "主导航", main: "首页", devblog: "开发博客", about: "关于项目", description: "kira是一个独立的UCI国际象棋引擎。" },
+        es: { nav: "navegación principal", main: "inicio", devblog: "blog de desarrollo", about: "sobre el proyecto", description: "kira es un motor de ajedrez UCI independiente." },
+        de: { nav: "hauptnavigation", main: "start", devblog: "entwicklerblog", about: "über das projekt", description: "kira ist eine unabhängige UCI-Schachengine." },
+        pl: { nav: "nawigacja główna", main: "główna", devblog: "blog deweloperski", about: "o projekcie", description: "kira to niezależny silnik szachowy UCI." }
+      };
+      const setOpen = open => {
+        root.classList.toggle("is-open", open);
+        toggle.setAttribute("aria-expanded", String(open));
+      };
+      const select = code => {
+        const btn = [...items].find(item => item.dataset.lang === code) || items[0];
+        items.forEach(item => item.removeAttribute("aria-current"));
+        btn.setAttribute("aria-current", "true");
+        label.textContent = btn.textContent;
+        label.lang = btn.lang;
+        document.documentElement.lang = btn.dataset.lang;
+        document.querySelectorAll("[data-i18n]").forEach(element => {
+          element.textContent = strings[btn.dataset.lang][element.dataset.i18n];
+        });
+        nav.setAttribute("aria-label", strings[btn.dataset.lang].nav);
+        return btn.dataset.lang;
+      };
+      toggle.addEventListener("click", () => setOpen(!root.classList.contains("is-open")));
+      items.forEach(btn => btn.addEventListener("click", () => {
+        const code = select(btn.dataset.lang);
+        try { localStorage.setItem("kira-lang", code); } catch (e) {}
+        setOpen(false);
+        toggle.focus();
+      }));
+      try { const saved = localStorage.getItem("kira-lang"); if (saved) select(saved); } catch (e) {}
+      document.addEventListener("click", event => { if (!root.contains(event.target)) setOpen(false); });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && root.classList.contains("is-open")) { setOpen(false); toggle.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

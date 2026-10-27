@@ -1,14 +1,739 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kira Chess Engine</title>
+  <meta name="color-scheme" content="dark">
+  <title>kira</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: #a0a0a0;
+      --line: #303030;
+      --font: "League Spartan", "Century Gothic", "Avenir Next", system-ui, sans-serif;
+      --pad: clamp(1.25rem, 4vw, 3rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { color-scheme: dark; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+    a { color: inherit; }
+    :focus-visible { outline: 1px solid #fff; outline-offset: 5px; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg);
+      box-shadow: 0 0 0 var(--pad) var(--bg);
+      width: min(100% - 2 * var(--pad), 84rem);
+      min-height: 6.5rem;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 2rem;
+    }
+    .logo {
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.65rem;
+      padding: .35rem .7rem .2rem;
+      border: 1px solid #fff;
+      color: #fff;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      line-height: 1;
+      text-decoration: none;
+    }
+    .nav { display: flex; align-items: center; gap: clamp(1.4rem, 3vw, 2.5rem); }
+    .nav a {
+      position: relative;
+      padding: .55rem 0;
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 500;
+      white-space: nowrap;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+    .nav a::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .2s ease;
+    }
+    .nav a:hover, .nav a:focus-visible, .nav a[aria-current="location"] { color: #fff; }
+    .nav a:hover::after, .nav a:focus-visible::after, .nav a[aria-current="location"]::after { transform: scaleX(1); }
+
+    .lang { position: relative; justify-self: end; z-index: 2; }
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem 0;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color .2s ease;
+    }
+    .lang-toggle:hover, .lang.is-open .lang-toggle { color: #fff; }
+    .lang-chevron { width: .65rem; height: .65rem; transition: transform .2s ease; }
+    .lang.is-open .lang-chevron { transform: rotate(180deg); }
+    .lang-menu {
+      position: absolute;
+      top: calc(100% + .5rem);
+      right: 0;
+      display: grid;
+      grid-template-rows: 0fr;
+      min-width: 8rem;
+      visibility: hidden;
+      transition: grid-template-rows .25s ease, visibility 0s linear .25s;
+    }
+    .lang.is-open .lang-menu { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+    .lang-menu ul {
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      list-style: none;
+      background: #111;
+    }
+    .lang-menu button {
+      width: 100%;
+      padding: .55rem .9rem;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .lang-menu button:hover, .lang-menu button:focus-visible, .lang-menu button[aria-current="true"] { color: #fff; }
+
+    .landing {
+      position: relative;
+      top: -12px;
+      width: min(100% - 2 * var(--pad), 84rem);
+      min-height: calc(100svh - 6.5rem);
+      margin: 0 auto;
+      padding: clamp(3.5rem, 8vh, 7rem) 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: center;
+      gap: clamp(3rem, 7vw, 7rem);
+    }
+    .hero { text-align: center; }
+    .hero h1 {
+      max-width: 12ch;
+      margin: 0 auto;
+      font-size: clamp(3.5rem, 6.2vw, 6.5rem);
+      font-weight: 700;
+      letter-spacing: -.055em;
+      line-height: .98;
+      overflow-wrap: anywhere;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 29rem;
+      margin: 1.8rem auto 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.2vw, 1.15rem);
+      font-weight: 500;
+      line-height: 1.5;
+      text-wrap: balance;
+    }
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .github-pill, .social-pill {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: .8rem 1.1rem;
+      border: 1px solid #4c4c4c;
+      border-radius: 999px;
+      background: transparent;
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 500;
+      line-height: 1;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+    .github-pill:first-child { background: #fff; border-color: #fff; color: #000; }
+    .github-pill:first-child:hover { background: #d8d8d8; border-color: #d8d8d8; }
+    .github-pill:not(:first-child):hover, .social-pill:hover { background: #171717; border-color: #888; }
+    .github-pill svg, .social-pill svg { width: 16px; height: 16px; flex: none; fill: currentColor; }
+
+    .stage {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+    .board {
+      position: relative;
+      display: grid;
+      grid-template: 1fr 1fr / 1fr 1fr;
+      width: 100%;
+      aspect-ratio: 1;
+    }
+    .sq:nth-child(1), .sq:nth-child(4) { background: var(--text); }
+    .piece, .ring { position: absolute; top: 0; left: 0; width: 50%; height: 50%; }
+    .piece { padding: 9.3%; transform-origin: 50% 88%; will-change: transform; }
+    .piece svg { display: block; width: 100%; height: 100%; overflow: visible; transform-origin: 50% 50%; }
+    .piece.black svg {
+      filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+              drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
+    }
+    .ring::after { content: ""; position: absolute; inset: 20%; border: 1.5px solid var(--text); border-radius: 50%; }
+
+
+    .fold-x, .fold-y { width: 100%; aspect-ratio: 1; transform-style: preserve-3d; }
+    .fold-x {
+      width: min(62%, 20rem);
+      transition: transform .52s cubic-bezier(.45, 0, .2, 1) .24s;
+    }
+    .fold-y { transition: transform .52s cubic-bezier(.45, 0, .2, 1); }
+    .stage.is-folded .fold-x { transform: perspective(900px) rotateY(-60deg); transition-delay: 0s; }
+    .stage.is-folded .fold-y { transform: perspective(900px) rotateX(60deg); transition-delay: .24s; }
+
+    .section {
+      width: min(100% - 2 * var(--pad), 52rem);
+      margin: 0 auto;
+      padding: clamp(5rem, 10vw, 9rem) 0;
+      scroll-margin-top: 6rem;
+    }
+    #home { scroll-margin-top: 6rem; }
+    .about-section { min-height: 85svh; display: flex; align-items: center; }
+    .section h2 {
+      margin: 0 0 2.5rem;
+      font-size: clamp(3rem, 7vw, 5rem);
+      letter-spacing: -.045em;
+      line-height: 1;
+      overflow-wrap: anywhere;
+    }
+    .about-copy { max-width: 42rem; }
+    .about-copy p {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+      font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+      line-height: 1.55;
+    }
+    .blog-section { min-height: calc(100svh - 6.5rem); }
+    .posts { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .post-link {
+      display: grid;
+      grid-template-columns: 8rem minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 1.4rem 0;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+    }
+    .post-link:hover .post-title { text-decoration: underline; text-underline-offset: .2em; }
+    .post-title { font-size: clamp(1.3rem, 3vw, 1.65rem); font-weight: 700; overflow-wrap: anywhere; }
+    .posts time, .message, .arrow { color: var(--muted); }
+    .posts time { font-size: .95rem; }
+    .arrow { font-size: 1.2rem; }
+    .message { font-size: 1.1rem; line-height: 1.5; }
+
+    @media (max-width: 850px) {
+      .landing {
+        min-height: calc(100svh - 6.5rem);
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 4rem;
+        padding: 5rem 0;
+      }
+      .hero { max-width: 40rem; }
+      .hero h1 { font-size: clamp(3.25rem, 9vw, 5.75rem); }
+      .stage { max-width: 27rem; }
+    }
+    @media (max-width: 700px) {
+      .site-header {
+        min-height: 0;
+        grid-template-columns: 1fr auto;
+        gap: 1.25rem 1rem;
+        padding: 1.25rem 0;
+      }
+      .logo { grid-row: 1; grid-column: 1; font-size: 1.5rem; min-height: 2.4rem; }
+      .lang { grid-row: 1; grid-column: 2; }
+      .nav { grid-row: 2; grid-column: 1 / -1; justify-content: center; flex-wrap: wrap; gap: .25rem 1.5rem; }
+      .landing { min-height: calc(100svh - 8.5rem); gap: 3.5rem; padding: 4rem 0; }
+      .section { scroll-margin-top: 8rem; }
+      .post-link { grid-template-columns: minmax(0, 1fr) auto; gap: .5rem 1rem; }
+      .post-link time { grid-column: 1 / -1; }
+      .hero h1 { font-size: clamp(2.9rem, 11vw, 4.5rem); }
+      .hero p { margin-top: 1.5rem; }
+      .hero-actions { gap: .625rem; }
+      .github-pill, .social-pill { font-size: .875rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .fold-x, .fold-y { transition: none; }
+      .stage.is-folded .fold-x, .stage.is-folded .fold-y { transform: none; }
+      .nav a, .nav a::after, .lang-toggle, .lang-chevron, .lang-menu, .github-pill, .social-pill { transition: none; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Kira Chess Engine</h1>
-  <p>An independent chess engine written in Rust.</p>
-  <p>Development blog coming soon.</p>
+  <header class="site-header">
+    <a class="logo" href="#home">kira</a>
+
+    <nav class="nav" aria-label="Main">
+      <a href="#home" aria-current="location" data-i18n="main">main</a>
+      <a href="#about" data-i18n="about">about project</a>
+      <a href="#devblog" data-i18n="devblog">devblog</a>
+    </nav>
+
+    <div class="lang">
+      <button class="lang-toggle" type="button" aria-expanded="false" aria-controls="lang-menu">
+        <span class="lang-label" lang="en">english</span>
+        <svg class="lang-chevron" viewBox="0 0 10 10" aria-hidden="true">
+          <path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="lang-menu" id="lang-menu">
+        <ul>
+          <li><button type="button" lang="en" data-lang="en" aria-current="true">english</button></li>
+          <li><button type="button" lang="ja" data-lang="ja">日本語</button></li>
+          <li><button type="button" lang="zh-Hans" data-lang="zh-Hans">中文</button></li>
+          <li><button type="button" lang="es" data-lang="es">español</button></li>
+          <li><button type="button" lang="de" data-lang="de">deutsch</button></li>
+          <li><button type="button" lang="pl" data-lang="pl">polski</button></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main>
+  <section class="landing" id="home">
+  <section class="hero">
+    <h1 data-i18n="tagline">a new world, one move at a time</h1>
+    <p data-i18n="sub">available for apple silicon macs and x64 windows machines</p>
+    <div class="hero-actions">
+      <a class="github-pill" href="https://github.com/KiraChess/Kira/releases/tag/kira-1-alpha-v1.0.1" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .75a11.25 11.25 0 0 0-3.558 21.923c.563.104.77-.244.77-.542 0-.267-.01-.975-.015-1.914-3.13.68-3.791-1.509-3.791-1.509-.512-1.3-1.25-1.646-1.25-1.646-1.022-.699.078-.685.078-.685 1.13.08 1.725 1.16 1.725 1.16 1.004 1.72 2.634 1.223 3.276.935.102-.727.393-1.223.715-1.504-2.499-.284-5.126-1.25-5.126-5.563 0-1.23.44-2.233 1.16-3.02-.117-.285-.503-1.43.11-2.98 0 0 .945-.303 3.094 1.154a10.785 10.785 0 0 1 5.626 0c2.147-1.457 3.09-1.154 3.09-1.154.615 1.55.23 2.695.113 2.98.722.787 1.158 1.79 1.158 3.02 0 4.323-2.63 5.276-5.137 5.555.404.35.764 1.042.764 2.1 0 1.517-.014 2.741-.014 3.113 0 .3.203.65.774.54A11.252 11.252 0 0 0 12 .75Z"/></svg>
+        <span>GitHub Release (latest)</span>
+      </a>
+      <a class="github-pill" href="https://github.com/KiraChess/Kira" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .75a11.25 11.25 0 0 0-3.558 21.923c.563.104.77-.244.77-.542 0-.267-.01-.975-.015-1.914-3.13.68-3.791-1.509-3.791-1.509-.512-1.3-1.25-1.646-1.25-1.646-1.022-.699.078-.685.078-.685 1.13.08 1.725 1.16 1.725 1.16 1.004 1.72 2.634 1.223 3.276.935.102-.727.393-1.223.715-1.504-2.499-.284-5.126-1.25-5.126-5.563 0-1.23.44-2.233 1.16-3.02-.117-.285-.503-1.43.11-2.98 0 0 .945-.303 3.094 1.154a10.785 10.785 0 0 1 5.626 0c2.147-1.457 3.09-1.154 3.09-1.154.615 1.55.23 2.695.113 2.98.722.787 1.158 1.79 1.158 3.02 0 4.323-2.63 5.276-5.137 5.555.404.35.764 1.042.764 2.1 0 1.517-.014 2.741-.014 3.113 0 .3.203.65.774.54A11.252 11.252 0 0 0 12 .75Z"/></svg>
+        <span>Repository</span>
+      </a>
+    </div>
+  </section>
+
+
+  <div class="stage" aria-hidden="true">
+    <div class="fold-x"><div class="fold-y">
+    <div class="board">
+      <div class="sq"></div><div class="sq"></div>
+      <div class="sq"></div><div class="sq"></div>
+
+      <div class="piece white"><svg viewBox="0 0 45 45" aria-hidden="true">
+<g style="fill:#ffffff;stroke:#000000;stroke-width:1.5;stroke-linejoin:round">
+    <path d="M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z"/>
+    <path d="M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 11,36 11,36 C 9.5,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z"/>
+    <path d="M 11.5,30 C 15,29 30,29 33.5,30" style="fill:none"/>
+    <path d="M 12,33.5 C 18,32.5 27,32.5 33,33.5" style="fill:none"/>
+    <circle cx="6" cy="12" r="2" />
+    <circle cx="14" cy="9" r="2" />
+    <circle cx="22.5" cy="8" r="2" />
+    <circle cx="31" cy="9" r="2" />
+    <circle cx="39" cy="12" r="2" />
+  </g>
+      </svg></div>
+      <div class="piece black"><svg viewBox="0 0 45 45" aria-hidden="true">
+<g style="opacity:1; fill:none; fill-rule:evenodd; fill-opacity:1; stroke:#000000; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1;" transform="translate(0,0.6)">
+    <g style="fill:#000000; stroke:#000000; stroke-linecap:butt;">
+      <path d="M 9,36 C 12.39,35.03 19.11,36.43 22.5,34 C 25.89,36.43 32.61,35.03 36,36 C 36,36 37.65,36.54 39,38 C 38.32,38.97 37.35,38.99 36,38.5 C 32.61,37.53 25.89,38.96 22.5,37.5 C 19.11,38.96 12.39,37.53 9,38.5 C 7.65,38.99 6.68,38.97 6,38 C 7.35,36.54 9,36 9,36 z"/>
+      <path d="M 15,32 C 17.5,34.5 27.5,34.5 30,32 C 30.5,30.5 30,30 30,30 C 30,27.5 27.5,26 27.5,26 C 33,24.5 33.5,14.5 22.5,10.5 C 11.5,14.5 12,24.5 17.5,26 C 17.5,26 15,27.5 15,30 C 15,30 14.5,30.5 15,32 z"/>
+      <path d="M 25 8 A 2.5 2.5 0 1 1  20,8 A 2.5 2.5 0 1 1  25 8 z"/>
+    </g>
+    <path d="M 17.5,26 L 27.5,26 M 15,30 L 30,30 M 22.5,15.5 L 22.5,20.5 M 20,18 L 25,18" style="fill:none; stroke:#ffffff; stroke-linejoin:miter;"/>
+  </g>
+      </svg></div>
+    </div>
+    </div></div>
+  </div>
+  </section>
+
+  <section class="section about-section" id="about" aria-labelledby="about-title">
+    <div class="about-copy">
+      <h2 id="about-title" data-i18n="about">about project</h2>
+      <p data-i18n="aboutIntro">kira is an independent chess engine built from the ground up, one move at a time.</p>
+      <p data-i18n="aboutDetail">it combines its own move generation and search with a neural evaluation trained on games kira played against itself. the result is an engine shaped by its own experience.</p>
+      <p data-i18n="aboutOpen">kira is open source and speaks UCI, so you can explore how it works or bring it into your chess GUI.</p>
+      <a class="social-pill" href="https://x.com/kirachessengine" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-7.4L5.5 22H2.4l7.3-8.4L1 2h6.5l4.5 6.7L18.9 2Zm-1.1 18h1.7L6.6 3.9H4.8L17.8 20Z"/></svg>
+        <span data-i18n="follow">follow the development</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section blog-section" id="devblog" aria-labelledby="devblog-title">
+    <h2 id="devblog-title" data-i18n="devblog">devblog</h2>
+    <div id="blog-content">
+      <p class="message" id="status" data-i18n="blogError">Posts could not be loaded.</p>
+      <noscript><style>#status { display: none; }</style><p class="message">Enable JavaScript to read the devblog.</p></noscript>
+    </div>
+  </section>
+  </main>
+
+  <script src="posts.js"></script>
+  <script>
+
+    (() => {
+      if (!Array.isArray(window.kiraPosts)) return;
+      const validDate = date => {
+        if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+        const parsed = new Date(date + "T00:00:00Z");
+        return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
+      };
+      const posts = window.kiraPosts.filter(post => post && typeof post.slug === "string" && typeof post.title === "string" && validDate(post.date) && Array.isArray(post.body));
+      posts.sort((a, b) => b.date.localeCompare(a.date));
+      const status = document.getElementById("status");
+      if (!posts.length) {
+        status.dataset.i18n = "blogEmpty";
+        status.textContent = "No posts yet.";
+        return;
+      }
+      status.remove();
+      const list = document.createElement("ul");
+      list.className = "posts";
+      posts.forEach(post => {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.className = "post-link";
+        link.href = "devblog.html?post=" + encodeURIComponent(post.slug);
+        const time = document.createElement("time");
+        time.dateTime = post.date;
+        time.textContent = new Intl.DateTimeFormat("en", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(post.date + "T00:00:00Z"));
+        const title = document.createElement("span");
+        title.className = "post-title";
+        title.dataset.postTitle = post.slug;
+        title.textContent = post.title;
+        const arrow = document.createElement("span");
+        arrow.className = "arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "↗";
+        link.append(time, title, arrow);
+        item.append(link);
+        list.append(item);
+      });
+      document.getElementById("blog-content").append(list);
+    })();
+
+    (() => {
+      const root = document.querySelector(".lang");
+      const toggle = root.querySelector(".lang-toggle");
+      const label = root.querySelector(".lang-label");
+      const items = root.querySelectorAll(".lang-menu button");
+      const nav = document.querySelector(".nav");
+
+      // add a key here + a data-i18n="key" on the element to translate more text later
+      const strings = {
+        "en":      { nav: "main",                  main: "main",    devblog: "devblog",           about: "about project" },
+        "ja":      { nav: "メインナビゲーション",     main: "ホーム",   devblog: "開発ブログ",          about: "プロジェクトについて" },
+        "zh-Hans": { nav: "主导航",                 main: "首页",     devblog: "开发博客",            about: "关于项目" },
+        "es":      { nav: "navegación principal",  main: "inicio",  devblog: "blog de desarrollo", about: "sobre el proyecto" },
+        "de":      { nav: "hauptnavigation",       main: "start",   devblog: "entwicklerblog",     about: "über das projekt" },
+        "pl":      { nav: "nawigacja główna",      main: "główna",  devblog: "blog deweloperski",  about: "o projekcie" }
+      };
+
+      // hero text, merged into the same per-language strings
+      const hero = {
+        "en":      { tagline: "a new world, one move at a time",      sub: "available for apple silicon macs and x64 windows machines" },
+        "ja":      { tagline: "新しい世界を、一手ずつ",                  sub: "apple silicon搭載macとx64 windowsに対応" },
+        "zh-Hans": { tagline: "新世界，一步一步来",                      sub: "适用于apple silicon mac和x64 windows设备" },
+        "es":      { tagline: "un mundo nuevo, una jugada a la vez",   sub: "disponible para macs con apple silicon y equipos windows x64" },
+        "de":      { tagline: "eine neue welt, zug um zug",            sub: "verfügbar für macs mit apple silicon und x64-windows-computer" },
+        "pl":      { tagline: "nowy świat, ruch po ruchu",             sub: "dostępne na macach z apple silicon i komputerach z windows x64" }
+      };
+      for (const code in hero) Object.assign(strings[code], hero[code]);
+
+      const blogStrings = {
+        "en":      { blogError: "Posts could not be loaded.", blogEmpty: "No posts yet.", blogBack: "← all posts", blogNotFound: "post not found" },
+        "ja":      { blogError: "記事を読み込めませんでした。", blogEmpty: "記事はまだありません。", blogBack: "← すべての記事", blogNotFound: "記事が見つかりません" },
+        "zh-Hans": { blogError: "无法加载文章。", blogEmpty: "暂无文章。", blogBack: "← 所有文章", blogNotFound: "未找到文章" },
+        "es":      { blogError: "No se pudieron cargar las publicaciones.", blogEmpty: "Aún no hay publicaciones.", blogBack: "← todas las publicaciones", blogNotFound: "publicación no encontrada" },
+        "de":      { blogError: "Beiträge konnten nicht geladen werden.", blogEmpty: "Noch keine Beiträge.", blogBack: "← alle Beiträge", blogNotFound: "Beitrag nicht gefunden" },
+        "pl":      { blogError: "Nie udało się wczytać wpisów.", blogEmpty: "Nie ma jeszcze wpisów.", blogBack: "← wszystkie wpisy", blogNotFound: "nie znaleziono wpisu" }
+      };
+      for (const code in blogStrings) Object.assign(strings[code], blogStrings[code]);
+
+      const aboutStrings = {
+        en: { aboutIntro: "kira is an independent chess engine built from the ground up, one move at a time.", aboutDetail: "it combines its own move generation and search with a neural evaluation trained on games kira played against itself. the result is an engine shaped by its own experience.", aboutOpen: "kira is open source and speaks UCI, so you can explore how it works or bring it into your chess GUI." },
+        ja: { aboutIntro: "kiraは、一手ずつ、一から作り上げた独立したチェスエンジンです。", aboutDetail: "独自の合法手生成と探索を、kira自身の対局で学習したニューラル評価と組み合わせています。", aboutOpen: "kiraはオープンソースのUCIエンジンです。仕組みを調べたり、お使いのチェスGUIで動かしたりできます。" },
+        "zh-Hans": { aboutIntro: "kira是从零开始、一步一步打造的独立国际象棋引擎。", aboutDetail: "它结合自主实现的走法生成与搜索，以及用kira自我对弈棋局训练的神经网络评估。", aboutOpen: "kira是开源UCI引擎，你可以研究它的工作原理，也可以在国际象棋GUI中使用。" },
+        es: { aboutIntro: "kira es un motor de ajedrez independiente, construido desde cero, una jugada a la vez.", aboutDetail: "combina su propia generación de movimientos y búsqueda con una evaluación neuronal entrenada con partidas que kira jugó contra sí mismo.", aboutOpen: "kira es de código abierto y utiliza UCI, así que puedes explorar cómo funciona o usarlo en tu interfaz de ajedrez." },
+        de: { aboutIntro: "kira ist eine unabhängige Schachengine, von Grund auf aufgebaut, Zug um Zug.", aboutDetail: "sie verbindet eigene Zugerzeugung und Suche mit einer neuronalen Bewertung, die mit kiras eigenen Selbstspielpartien trainiert wurde.", aboutOpen: "kira ist quelloffen und spricht UCI. du kannst ihre Funktionsweise erkunden oder sie in deiner Schachoberfläche verwenden." },
+        pl: { aboutIntro: "kira to niezależny silnik szachowy zbudowany od podstaw, ruch po ruchu.", aboutDetail: "łączy własne generowanie ruchów i wyszukiwanie z oceną neuronową wytrenowaną na partiach, które kira rozegrała sama ze sobą.", aboutOpen: "kira jest otwartoźródłowa i obsługuje UCI, więc możesz poznać jej działanie lub uruchomić ją w swoim programie szachowym." }
+      };
+      for (const code in aboutStrings) Object.assign(strings[code], aboutStrings[code]);
+      const followStrings = {
+        en: "follow the development",
+        ja: "開発の進捗をフォロー",
+        "zh-Hans": "关注开发进展",
+        es: "sigue el desarrollo",
+        de: "folge der entwicklung",
+        pl: "śledź rozwój"
+      };
+      for (const code in followStrings) strings[code].follow = followStrings[code];
+
+
+      const isOpen = () => root.classList.contains("is-open");
+      const setOpen = (open) => {
+        root.classList.toggle("is-open", open);
+        toggle.setAttribute("aria-expanded", String(open));
+      };
+
+      toggle.addEventListener("click", () => setOpen(!isOpen()));
+
+      const select = (code) => {
+        const btn = [...items].find((b) => b.dataset.lang === code) || items[0];
+        const t = strings[btn.dataset.lang];
+
+        items.forEach((b) => b.removeAttribute("aria-current"));
+        btn.setAttribute("aria-current", "true");
+        label.textContent = btn.textContent;
+        label.lang = btn.lang;
+        document.documentElement.lang = btn.dataset.lang;
+
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t[el.dataset.i18n];
+        });
+        nav.setAttribute("aria-label", t.nav);
+        const allPosts = Array.isArray(window.kiraPosts) ? window.kiraPosts : [];
+        document.querySelectorAll("[data-post-title]").forEach(element => {
+          const post = allPosts.find(item => item && item.slug === element.dataset.postTitle);
+          if (!post) return;
+          const translation = post.translations && post.translations[btn.dataset.lang];
+          element.textContent = translation && typeof translation.title === "string" ? translation.title : post.title;
+        });
+        document.querySelectorAll("[data-post-paragraph]").forEach(element => {
+          const post = allPosts.find(item => item && item.slug === element.dataset.postSlug);
+          if (!post) return;
+          const index = Number(element.dataset.postParagraph);
+          const translation = post.translations && post.translations[btn.dataset.lang];
+          const translated = translation && Array.isArray(translation.body) ? translation.body[index] : undefined;
+          element.textContent = typeof translated === "string" ? translated : post.body[index];
+        });
+        const articleTitle = document.querySelector(".article h1[data-post-title]");
+        if (articleTitle) document.title = articleTitle.textContent + " — kira devblog";
+        document.querySelectorAll("time[datetime]").forEach(time => {
+          const date = new Date(time.dateTime + "T00:00:00Z");
+          time.textContent = new Intl.DateTimeFormat(btn.dataset.lang, { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(date);
+        });
+        return btn.dataset.lang;
+      };
+
+      items.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const code = select(btn.dataset.lang);
+          try { localStorage.setItem("kira-lang", code); } catch (e) {}
+          setOpen(false);
+          toggle.focus();
+        });
+      });
+
+      // restore the saved language, if there is one
+      try {
+        const saved = localStorage.getItem("kira-lang");
+        if (saved) select(saved);
+      } catch (e) {}
+
+      document.addEventListener("click", (e) => {
+        if (!root.contains(e.target)) setOpen(false);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && isOpen()) {
+          setOpen(false);
+          toggle.focus();
+        }
+      });
+    })();
+
+
+    (() => {
+      const sections = [...document.querySelectorAll("#home, #about, #devblog")];
+      const links = [...document.querySelectorAll(".nav a")];
+      const stage = document.querySelector(".stage");
+      let pending = false;
+      let navigationTimer = null;
+      let foldUntil = 0;
+      const update = () => {
+        pending = false;
+        const marker = window.innerHeight * .38;
+        let current = sections[0];
+        sections.forEach(section => { if (section.getBoundingClientRect().top <= marker) current = section; });
+        links.forEach(link => {
+          if (link.getAttribute("href") === "#" + current.id) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+        const stageTop = stage.getBoundingClientRect().top;
+        stage.classList.toggle("is-folded", performance.now() < foldUntil || (window.scrollY > 70 && stageTop < window.innerHeight * .55));
+      };
+      links.forEach(link => link.addEventListener("click", event => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        if (navigationTimer !== null) clearTimeout(navigationTimer);
+        navigationTimer = null;
+        const target = document.querySelector(link.getAttribute("href"));
+        if (target.id === "home") { foldUntil = 0; stage.classList.remove("is-folded"); return; }
+        const box = stage.getBoundingClientRect();
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches || stage.classList.contains("is-folded") || box.bottom <= 0 || box.top >= window.innerHeight) return;
+        event.preventDefault();
+        foldUntil = performance.now() + 1000;
+        stage.classList.add("is-folded");
+        navigationTimer = setTimeout(() => {
+          navigationTimer = null;
+          try {
+            history.pushState(null, "", link.getAttribute("href"));
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          } catch (e) {
+            window.location.hash = link.getAttribute("href");
+          }
+          setTimeout(update, 550);
+        }, 450);
+      }));
+      window.addEventListener("scroll", () => {
+        if (!pending) { pending = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      window.addEventListener("resize", update);
+      update();
+    })();
+
+    // Queen vs bishop: both slide along diagonals in either direction, so each can
+    // legally capture the other on the long diagonal. One captures, the board turns
+    // 180° (the checkerboard looks identical), a fresh opponent fades in, and the roles
+    // swap. Positions are in % of one square.
+    (() => {
+      const board = document.querySelector(".board");
+      const white = board.querySelector(".white");
+      const black = board.querySelector(".black");
+      const BL = { x: 0, y: 100 }, TR = { x: 100, y: 0 };
+
+      const at = (c, dy = 0, s = "1, 1") => `translate(${c.x}%, ${c.y + dy}%) scale(${s})`;
+      const put = (el, c) => { el.style.transform = at(c); };
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      put(white, BL);
+      put(black, TR);
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      function ring(c) {
+        const r = document.createElement("div");
+        r.className = "ring";
+        board.append(r);
+        r.animate(
+          [{ transform: at(c, 0, "0.6, 0.6"), opacity: 0.9 },
+           { transform: at(c, 0, "1.7, 1.7"), opacity: 0 }],
+          { duration: 650, easing: "ease-out" }
+        ).finished.then(() => r.remove());
+      }
+
+      async function round(atk, vic, from, to) {
+        const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+
+        // wind-up, arcing hop, landing squash
+        const hop = atk.animate([
+          { transform: at(from), offset: 0, easing: "ease-out" },
+          { transform: at(from, 0, "1.1, 0.86"), offset: 0.2, easing: "ease-out" },
+          { transform: at(mid, -14, "1.3, 1.3"), offset: 0.52, easing: "ease-in" },
+          { transform: at(to), offset: 0.76, easing: "ease-out" },
+          { transform: at(to, 0, "1.12, 0.84"), offset: 0.86, easing: "ease-out" },
+          { transform: at(to), offset: 1 }
+        ], { duration: 1100, fill: "forwards" });
+
+        // the captured pawn pops just as the attacker lands
+        const pop = vic.animate([
+          { transform: at(to), opacity: 1 },
+          { transform: at(to, 0, "1.25, 1.25") + " rotate(10deg)", opacity: 1, offset: 0.3 },
+          { transform: at(to, 0, "0.2, 0.2") + " rotate(-25deg)", opacity: 0 }
+        ], { delay: 800, duration: 320, easing: "ease-in", fill: "both" });
+        setTimeout(() => ring(to), 830);
+
+        await Promise.all([hop.finished, pop.finished]);
+        put(atk, to);
+        vic.style.opacity = 0;
+        hop.cancel();
+        pop.cancel();
+
+        await sleep(600);
+
+        // a fresh opponent fades in while the board turns half a revolution
+        put(vic, from);
+        const spawn = vic.animate(
+          [{ transform: at(from, 0, "0.5, 0.5"), opacity: 0 },
+           { transform: at(from), opacity: 1 }],
+          { delay: 150, duration: 550, easing: "ease-out", fill: "both" }
+        );
+        const spin = board.animate(
+          [{ transform: "rotate(0deg)" }, { transform: "rotate(180deg)" }],
+          { duration: 1000, easing: "cubic-bezier(.65, 0, .25, 1)", fill: "forwards" }
+        );
+
+        // the pieces turn a half-turn of their own, starting a hair after the board and
+        // easing slightly differently, so they land upright instead of snapping at the end
+        const turns = [atk, vic].map((p) =>
+          p.querySelector("svg").animate(
+            [{ transform: "rotate(0deg)" }, { transform: "rotate(180deg)" }],
+            { delay: 60, duration: 1000, easing: "cubic-bezier(.5, 0, .2, 1)", fill: "forwards" }
+          )
+        );
+
+        await Promise.all([spin.finished, ...turns.map((t) => t.finished)]);
+        put(atk, from);
+        put(vic, to);
+        vic.style.opacity = 1;
+        spawn.cancel();
+        spin.cancel();
+        turns.forEach((t) => t.cancel());
+      }
+
+      (async () => {
+        let atk = white, vic = black, from = BL, to = TR;
+        for (;;) {
+          await sleep(700);
+          await round(atk, vic, from, to);
+          [atk, vic] = [vic, atk];
+          [from, to] = [to, from];
+        }
+      })();
+    })();
+  </script>
 </body>
 </html>
