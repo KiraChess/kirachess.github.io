@@ -1,6 +1,59 @@
 // Add posts to this array. See DEVLOG-README.md for instructions.
 window.kiraPosts = [
   {
+    "slug": "kira-1-alpha-v1-0-2-hotfix",
+    "date": "2026-10-27",
+    "title": "Kira 1 Alpha v1.0.2: Linux x64 and a cleaner repo",
+    "body": [
+      "Kira 1 Alpha v1.0.2 adds a Linux x64 build. Download the ZIP, extract it, and add kira1a to your UCI chess GUI. Keep kira1a-retrained.nnue next to the executable so Kira can load it automatically. If necessary, run chmod +x kira1a after extracting.",
+      "I also cleaned up the repository and made the documentation easier to read, so it is simpler to find what you need to install, use, and build Kira.",
+      "This is a platform and documentation update. The engine and NNUE weights are unchanged, and the original Alpha strength estimate still has the same measurement caveats. macOS Apple Silicon and Windows x64 packages are available too."
+    ],
+    "releaseUrl": "https://github.com/KiraChess/Kira/releases/tag/kira-1-alpha-v1.0.2",
+    "translations": {
+      "ja": {
+        "title": "Kira 1 Alpha v1.0.2：Linux x64対応とリポジトリの整理",
+        "body": [
+          "Kira 1 Alpha v1.0.2ではLinux x64ビルドを追加しました。ZIPをダウンロードして展開し、kira1aをUCI対応チェスGUIに追加してください。NNUEを自動で読み込めるよう、kira1a-retrained.nnueを実行ファイルの隣に置いてください。必要に応じて展開後にchmod +x kira1aを実行してください。",
+          "リポジトリも整理し、インストール、使用、ビルドに必要な情報を探しやすいようドキュメントを読みやすくしました。",
+          "今回はプラットフォームとドキュメントの更新です。エンジンとNNUEの重みは変わっておらず、元のAlphaの棋力推定には同じ測定上の注意点があります。macOS Apple Silicon版とWindows x64版もあります。"
+        ]
+      },
+      "zh-Hans": {
+        "title": "Kira 1 Alpha v1.0.2：Linux x64 与仓库整理",
+        "body": [
+          "Kira 1 Alpha v1.0.2 新增 Linux x64 版本。下载并解压 ZIP，将 kira1a 添加到支持 UCI 的国际象棋 GUI。请将 kira1a-retrained.nnue 放在可执行文件旁边，以便 Kira 自动加载。必要时，解压后运行 chmod +x kira1a。",
+          "我还整理了仓库，让文档更易读，方便找到安装、使用和构建 Kira 所需的信息。",
+          "这次更新针对平台支持和文档。引擎和 NNUE 权重保持不变，原版 Alpha 的棋力估计仍有相同的测量限制。也提供 macOS Apple Silicon 和 Windows x64 安装包。"
+        ]
+      },
+      "es": {
+        "title": "Kira 1 Alpha v1.0.2: Linux x64 y un repositorio más limpio",
+        "body": [
+          "Kira 1 Alpha v1.0.2 añade una versión para Linux x64. Descarga y extrae el ZIP, y añade kira1a a tu interfaz de ajedrez UCI. Mantén kira1a-retrained.nnue junto al ejecutable para que Kira lo cargue automáticamente. Si hace falta, ejecuta chmod +x kira1a después de extraerlo.",
+          "También he limpiado el repositorio y aclarado la documentación para que sea más fácil encontrar cómo instalar, usar y compilar Kira.",
+          "Esta actualización afecta a las plataformas y la documentación. El motor y los pesos de NNUE no han cambiado, y la estimación de fuerza de la Alpha original conserva las mismas limitaciones de medición. También hay paquetes para macOS Apple Silicon y Windows x64."
+        ]
+      },
+      "de": {
+        "title": "Kira 1 Alpha v1.0.2: Linux x64 und ein aufgeräumtes Repository",
+        "body": [
+          "Kira 1 Alpha v1.0.2 bringt einen Linux-x64-Build. Lade die ZIP-Datei herunter, entpacke sie und füge kira1a zu deiner UCI-Schachoberfläche hinzu. Lege kira1a-retrained.nnue neben die ausführbare Datei, damit Kira das Netz automatisch lädt. Führe bei Bedarf nach dem Entpacken chmod +x kira1a aus.",
+          "Ich habe außerdem das Repository aufgeräumt und die Dokumentation lesbarer gemacht, damit du Informationen zum Installieren, Verwenden und Kompilieren von Kira leichter findest.",
+          "Dieses Update betrifft Plattformen und Dokumentation. Engine und NNUE-Gewichte sind unverändert; für die ursprüngliche Alpha-Spielstärkeschätzung gelten dieselben Einschränkungen. Pakete für macOS Apple Silicon und Windows x64 sind ebenfalls verfügbar."
+        ]
+      },
+      "pl": {
+        "title": "Kira 1 Alpha v1.0.2: Linux x64 i porządki w repozytorium",
+        "body": [
+          "Kira 1 Alpha v1.0.2 dodaje wersję dla Linux x64. Pobierz i rozpakuj ZIP, a następnie dodaj kira1a do programu szachowego obsługującego UCI. Umieść kira1a-retrained.nnue obok pliku wykonywalnego, aby Kira automatycznie wczytała sieć. W razie potrzeby po rozpakowaniu uruchom chmod +x kira1a.",
+          "Uporządkowałem też repozytorium i uprościłem dokumentację, żeby łatwiej było znaleźć informacje o instalacji, używaniu i kompilacji Kiry.",
+          "Ta aktualizacja dotyczy obsługi platform i dokumentacji. Silnik i wagi NNUE nie zmieniły się, a pierwotne oszacowanie siły Alphy ma te same ograniczenia pomiarowe. Dostępne są też paczki dla macOS Apple Silicon i Windows x64."
+        ]
+      }
+    }
+  },
+  {
     "slug": "kira-1-alpha-v1-0-1-hotfix",
     "date": "2026-10-27",
     "title": "Kira 1 Alpha v1.0.1: usability and compatibility hotfix",

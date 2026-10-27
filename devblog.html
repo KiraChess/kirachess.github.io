@@ -265,6 +265,15 @@
           paragraph.textContent = text;
           body.append(paragraph);
         });
+        if (typeof post.releaseUrl === "string" && post.releaseUrl.startsWith("https://github.com/KiraChess/Kira/releases/tag/")) {
+          const release = document.createElement("a");
+          release.href = post.releaseUrl;
+          release.target = "_blank";
+          release.rel = "noopener noreferrer";
+          release.dataset.i18n = "releaseLink";
+          release.textContent = "View the release and downloads ↗";
+          body.append(release);
+        }
         article.append(time, heading, body);
         content.append(article);
       } else if (posts.length) {
@@ -322,6 +331,15 @@
         "pl":      { blogError: "Nie udało się wczytać wpisów.", blogEmpty: "Nie ma jeszcze wpisów.", blogBack: "← wszystkie wpisy", blogNotFound: "nie znaleziono wpisu" }
       };
       for (const code in blogStrings) Object.assign(strings[code], blogStrings[code]);
+      const releaseStrings = {
+        en: "View the release and downloads ↗",
+        ja: "リリースとダウンロードを見る ↗",
+        "zh-Hans": "查看发布版本和下载 ↗",
+        es: "Ver la versión y las descargas ↗",
+        de: "Release und Downloads ansehen ↗",
+        pl: "Zobacz wydanie i pliki do pobrania ↗"
+      };
+      for (const code in releaseStrings) strings[code].releaseLink = releaseStrings[code];
 
       const isOpen = () => root.classList.contains("is-open");
       const setOpen = (open) => {
